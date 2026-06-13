@@ -1,0 +1,14 @@
+server:
+  addr: ":8080"
+  gin_mode: "release"
+
+database:
+  driver: "mysql"
+  dsn: ""
+
+migrations:
+  path: "./migrations"
+
+logging:
+  level: "info"
+  format: "json"

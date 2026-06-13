@@ -1,0 +1,14 @@
+server:
+  addr: ":8080"
+  gin_mode: "debug"
+
+database:
+  driver: "sqlite"
+  dsn: "file:data/todos.db?cache=shared"
+
+migrations:
+  path: "./migrations"
+
+logging:
+  level: "info"
+  format: "text"

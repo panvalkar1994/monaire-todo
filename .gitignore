@@ -1,0 +1,13 @@
+config/config.yaml
+data/
+bin/
+_bmad-output/
+_bmad/
+.agents/
+
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.gocache/

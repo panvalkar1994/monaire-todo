@@ -1,0 +1,310 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "monaire-todo",
+    "description": "CRUD API for monaire-todo at /api/v1/todos.\n\nSet `baseUrl` (default http://localhost:8080). After Create Todo, `todoId` is saved automatically for Get/Replace/Patch/Delete requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "todoId",
+      "value": "550e8400-e29b-41d4-a716-446655440000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Todos",
+      "item": [
+        {
+          "name": "Create Todo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('todoId', body.id);",
+                  "pm.test('Response has id', function () {",
+                  "    pm.expect(body.id).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Buy groceries\",\n  \"due_date\": \"2026-06-15\",\n  \"completed\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/todos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "todos"]
+            },
+            "description": "Create a new todo. Returns 201 with the created resource."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Todo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/todos/{{todoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "todos", "{{todoId}}"]
+            },
+            "description": "Get a single todo by ID. Returns 404 if not found."
+          },
+          "response": []
+        },
+        {
+          "name": "Replace Todo (PUT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "if (pm.response.headers.has('X-No-Changes')) {",
+                  "    pm.test('X-No-Changes header when identical', function () {",
+                  "        pm.expect(pm.response.headers.get('X-No-Changes')).to.eql('true');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Buy groceries and milk\",\n  \"due_date\": \"2026-06-20\",\n  \"completed\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/todos/{{todoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "todos", "{{todoId}}"]
+            },
+            "description": "Full replacement. All fields required. Upserts if ID missing. Sets X-No-Changes: true when body matches existing state."
+          },
+          "response": []
+        },
+        {
+          "name": "Replace Todo - Upsert (new ID)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK (upsert)', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Upserted todo\",\n  \"due_date\": \"2026-07-01\",\n  \"completed\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/todos/00000000-0000-4000-8000-000000000099",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "todos", "00000000-0000-4000-8000-000000000099"]
+            },
+            "description": "PUT with a non-existent ID creates the todo (upsert). Returns 200."
+          },
+          "response": []
+        },
+        {
+          "name": "Patch Todo",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"completed\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/todos/{{todoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "todos", "{{todoId}}"]
+            },
+            "description": "Partial update. Send any subset of text, due_date, completed."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Todo",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/todos/{{todoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "todos", "{{todoId}}"]
+            },
+            "description": "Delete a todo. Returns 204 No Content."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "List",
+      "item": [
+        {
+          "name": "List Todos (default - incomplete only)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is array', function () {",
+                  "    pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/todos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "todos"]
+            },
+            "description": "List incomplete todos sorted by due_date ascending."
+          },
+          "response": []
+        },
+        {
+          "name": "List Todos (include_completed=true)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/todos?include_completed=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "todos"],
+              "query": [
+                {
+                  "key": "include_completed",
+                  "value": "true"
+                }
+              ]
+            },
+            "description": "List all todos including completed. Also accepts 1, yes (case-insensitive)."
+          },
+          "response": []
+        },
+        {
+          "name": "List Todos (include_completed=false)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/todos?include_completed=false",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "todos"],
+              "query": [
+                {
+                  "key": "include_completed",
+                  "value": "false"
+                }
+              ]
+            },
+            "description": "Explicitly exclude completed todos. Also accepts 0, no, or empty value."
+          },
+          "response": []
+        },
+        {
+          "name": "List Todos (include_completed=invalid → 417)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 417 Expectation Failed', function () {",
+                  "    pm.response.to.have.status(417);",
+                  "});",
+                  "",
+                  "pm.test('Error message', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.error).to.eql('include_completed allowed values: true|false|empty');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/todos?include_completed=maybe",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "todos"],
+              "query": [
+                {
+                  "key": "include_completed",
+                  "value": "maybe"
+                }
+              ]
+            },
+            "description": "Invalid values (e.g. maybe, 2, t) return HTTP 417 with error body."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

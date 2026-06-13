@@ -1,0 +1,348 @@
+openapi: 3.0.3
+info:
+  title: monaire-todo API
+  description: |
+    REST API for managing todo items. Items are sorted by `due_date` ascending on list.
+    Default list excludes completed todos unless `include_completed=true`.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Local development
+
+tags:
+  - name: todos
+    description: Todo CRUD operations
+
+paths:
+  /api/v1/todos:
+    get:
+      tags: [todos]
+      summary: List todos
+      description: |
+        Returns todos sorted by `due_date` ascending (earliest first).
+        By default, completed todos are excluded.
+      operationId: listTodos
+      parameters:
+        - name: include_completed
+          in: query
+          required: false
+          description: |
+            Include completed todos in the result.
+            Accepted truthy values: `true`, `1`, `yes` (case-insensitive).
+            Accepted falsy values: `false`, `0`, `no`, or empty/omitted.
+            Any other value returns HTTP 417.
+          schema:
+            type: string
+            enum:
+              - ""
+              - "true"
+              - "false"
+              - "1"
+              - "0"
+              - "yes"
+              - "no"
+          examples:
+            default:
+              summary: Omit param (incomplete only)
+              value: ""
+            include:
+              summary: Include completed
+              value: "true"
+            exclude:
+              summary: Explicit exclude
+              value: "false"
+      responses:
+        "200":
+          description: List of todos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Todo"
+              examples:
+                incompleteOnly:
+                  summary: Default list (incomplete todos)
+                  value:
+                    - id: "550e8400-e29b-41d4-a716-446655440001"
+                      text: "Buy groceries"
+                      due_date: "2026-06-10"
+                      completed: false
+                allTodos:
+                  summary: With include_completed=true
+                  value:
+                    - id: "550e8400-e29b-41d4-a716-446655440001"
+                      text: "Buy groceries"
+                      due_date: "2026-06-10"
+                      completed: false
+                    - id: "550e8400-e29b-41d4-a716-446655440002"
+                      text: "Submit report"
+                      due_date: "2026-06-15"
+                      completed: true
+        "417":
+          description: Invalid include_completed query value
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: "include_completed allowed values: true|false|empty"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      tags: [todos]
+      summary: Create todo
+      operationId: createTodo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTodoRequest"
+            example:
+              text: "Buy groceries"
+              due_date: "2026-06-15"
+              completed: false
+      responses:
+        "201":
+          description: Todo created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Todo"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v1/todos/{id}:
+    parameters:
+      - $ref: "#/components/parameters/TodoId"
+
+    get:
+      tags: [todos]
+      summary: Get todo by ID
+      operationId: getTodo
+      responses:
+        "200":
+          description: Todo found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Todo"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    put:
+      tags: [todos]
+      summary: Replace todo (full update or upsert)
+      description: |
+        Replaces the entire mutable state of a todo. All three fields (`text`, `due_date`,
+        `completed`) are required in the body.
+
+        **Upsert:** If the todo ID does not exist, a new todo is created with that ID (HTTP 200).
+
+        **No changes:** If the body matches the existing todo exactly, the response is still
+        HTTP 200 with the current todo, and the response includes header `X-No-Changes: true`.
+      operationId: replaceTodo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReplaceTodoRequest"
+            example:
+              text: "Buy groceries and milk"
+              due_date: "2026-06-20"
+              completed: true
+      responses:
+        "200":
+          description: Todo replaced or created (upsert)
+          headers:
+            X-No-Changes:
+              description: Present with value `true` when the request body matches existing state
+              schema:
+                type: string
+                enum: ["true"]
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Todo"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    patch:
+      tags: [todos]
+      summary: Partially update todo
+      description: |
+        Updates only the fields present in the request body. Omitted fields remain unchanged.
+        At least one field must be provided.
+      operationId: patchTodo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchTodoRequest"
+            examples:
+              markComplete:
+                summary: Mark completed
+                value:
+                  completed: true
+              updateText:
+                summary: Update text only
+                value:
+                  text: "Updated task description"
+      responses:
+        "200":
+          description: Todo updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Todo"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    delete:
+      tags: [todos]
+      summary: Delete todo
+      operationId: deleteTodo
+      responses:
+        "204":
+          description: Todo deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+components:
+  parameters:
+    TodoId:
+      name: id
+      in: path
+      required: true
+      description: Todo UUID
+      schema:
+        type: string
+        format: uuid
+      example: "550e8400-e29b-41d4-a716-446655440000"
+
+  schemas:
+    Todo:
+      type: object
+      required: [id, text, due_date, completed]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: Server-generated UUID (client-supplied on PUT upsert)
+        text:
+          type: string
+          minLength: 1
+          description: Non-empty task description (trimmed)
+        due_date:
+          type: string
+          format: date
+          description: ISO 8601 date (YYYY-MM-DD)
+          example: "2026-06-15"
+        completed:
+          type: boolean
+          default: false
+
+    CreateTodoRequest:
+      type: object
+      required: [text, due_date]
+      properties:
+        text:
+          type: string
+          minLength: 1
+        due_date:
+          type: string
+          format: date
+        completed:
+          type: boolean
+          description: Optional; defaults to false when omitted
+
+    ReplaceTodoRequest:
+      type: object
+      required: [text, due_date, completed]
+      properties:
+        text:
+          type: string
+          minLength: 1
+        due_date:
+          type: string
+          format: date
+        completed:
+          type: boolean
+
+    PatchTodoRequest:
+      type: object
+      minProperties: 1
+      properties:
+        text:
+          type: string
+          minLength: 1
+        due_date:
+          type: string
+          format: date
+        completed:
+          type: boolean
+
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          description: Human-readable error message
+
+  responses:
+    BadRequest:
+      description: Validation failure or malformed JSON
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          examples:
+            invalidJson:
+              value:
+                error: "invalid JSON body"
+            textRequired:
+              value:
+                error: "validation failed: text is required"
+            badDate:
+              value:
+                error: "validation failed: due_date must be YYYY-MM-DD"
+            noFields:
+              value:
+                error: "validation failed: no fields to update"
+
+    NotFound:
+      description: Todo not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "todo not found"
+
+    InternalServerError:
+      description: Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "internal server error"
