@@ -4,7 +4,7 @@ import "time"
 
 type TodoModel struct {
 	ID        string    `gorm:"column:id;primaryKey;size:36"`
-	Text      string    `gorm:"column:text;size:500;not null"`
+	Description string    `gorm:"column:description;size:500;not null"`
 	DueDate   time.Time `gorm:"column:due_date;type:date;not null"`
 	Completed bool      `gorm:"column:completed;not null;default:false"`
 	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`

@@ -50,7 +50,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"text\": \"Buy groceries\",\n  \"due_date\": \"2026-06-15\",\n  \"completed\": false\n}"
+              "raw": "{\n  \"description\": \"Buy groceries\",\n  \"due_date\": \"2026-06-15\",\n  \"completed\": false\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/todos",
@@ -106,7 +106,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"text\": \"Buy groceries and milk\",\n  \"due_date\": \"2026-06-20\",\n  \"completed\": true\n}"
+              "raw": "{\n  \"description\": \"Buy groceries and milk\",\n  \"due_date\": \"2026-06-20\",\n  \"completed\": true\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/todos/{{todoId}}",
@@ -142,7 +142,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"text\": \"Upserted todo\",\n  \"due_date\": \"2026-07-01\",\n  \"completed\": false\n}"
+              "raw": "{\n  \"description\": \"Upserted todo\",\n  \"due_date\": \"2026-07-01\",\n  \"completed\": false\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/todos/00000000-0000-4000-8000-000000000099",
@@ -172,7 +172,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "todos", "{{todoId}}"]
             },
-            "description": "Partial update. Send any subset of text, due_date, completed."
+            "description": "Partial update. Send any subset of description, due_date, completed."
           },
           "response": []
         },

@@ -66,18 +66,18 @@ paths:
                   summary: Default list (incomplete todos)
                   value:
                     - id: "550e8400-e29b-41d4-a716-446655440001"
-                      text: "Buy groceries"
+                      description: "Buy groceries"
                       due_date: "2026-06-10"
                       completed: false
                 allTodos:
                   summary: With include_completed=true
                   value:
                     - id: "550e8400-e29b-41d4-a716-446655440001"
-                      text: "Buy groceries"
+                      description: "Buy groceries"
                       due_date: "2026-06-10"
                       completed: false
                     - id: "550e8400-e29b-41d4-a716-446655440002"
-                      text: "Submit report"
+                      description: "Submit report"
                       due_date: "2026-06-15"
                       completed: true
         "417":
@@ -102,7 +102,7 @@ paths:
             schema:
               $ref: "#/components/schemas/CreateTodoRequest"
             example:
-              text: "Buy groceries"
+              description: "Buy groceries"
               due_date: "2026-06-15"
               completed: false
       responses:
@@ -141,7 +141,7 @@ paths:
       tags: [todos]
       summary: Replace todo (full update or upsert)
       description: |
-        Replaces the entire mutable state of a todo. All three fields (`text`, `due_date`,
+        Replaces the entire mutable state of a todo. All three fields (`description`, `due_date`,
         `completed`) are required in the body.
 
         **Upsert:** If the todo ID does not exist, a new todo is created with that ID (HTTP 200).
@@ -156,7 +156,7 @@ paths:
             schema:
               $ref: "#/components/schemas/ReplaceTodoRequest"
             example:
-              text: "Buy groceries and milk"
+              description: "Buy groceries and milk"
               due_date: "2026-06-20"
               completed: true
       responses:
@@ -195,10 +195,10 @@ paths:
                 summary: Mark completed
                 value:
                   completed: true
-              updateText:
-                summary: Update text only
+              updateDescription:
+                summary: Update description only
                 value:
-                  text: "Updated task description"
+                  description: "Updated task description"
       responses:
         "200":
           description: Todo updated
@@ -240,14 +240,14 @@ components:
   schemas:
     Todo:
       type: object
-      required: [id, text, due_date, completed]
+      required: [id, description, due_date, completed]
       properties:
         id:
           type: string
           format: uuid
           readOnly: true
           description: Server-generated UUID (client-supplied on PUT upsert)
-        text:
+        description:
           type: string
           minLength: 1
           description: Non-empty task description (trimmed)
@@ -262,9 +262,9 @@ components:
 
     CreateTodoRequest:
       type: object
-      required: [text, due_date]
+      required: [description, due_date]
       properties:
-        text:
+        description:
           type: string
           minLength: 1
         due_date:
@@ -276,9 +276,9 @@ components:
 
     ReplaceTodoRequest:
       type: object
-      required: [text, due_date, completed]
+      required: [description, due_date, completed]
       properties:
-        text:
+        description:
           type: string
           minLength: 1
         due_date:
@@ -291,7 +291,7 @@ components:
       type: object
       minProperties: 1
       properties:
-        text:
+        description:
           type: string
           minLength: 1
         due_date:
@@ -319,9 +319,9 @@ components:
             invalidJson:
               value:
                 error: "invalid JSON body"
-            textRequired:
+            descriptionRequired:
               value:
-                error: "validation failed: text is required"
+                error: "validation failed: description is required"
             badDate:
               value:
                 error: "validation failed: due_date must be YYYY-MM-DD"

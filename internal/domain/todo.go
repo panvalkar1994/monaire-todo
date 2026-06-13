@@ -4,7 +4,7 @@ import "time"
 
 type Todo struct {
 	ID        string
-	Text      string
+	Description string
 	DueDate   time.Time
 	Completed bool
 	CreatedAt time.Time
@@ -12,7 +12,7 @@ type Todo struct {
 }
 
 type TodoPatch struct {
-	Text      *string
+	Description *string
 	DueDate   *time.Time
 	Completed *bool
 }

@@ -36,7 +36,7 @@ func (h *TodoHandler) create(c *gin.Context) {
 		return
 	}
 	todo, err := h.svc.Create(c.Request.Context(), service.CreateInput{
-		Text:      req.Text,
+		Description: req.Description,
 		DueDate:   req.DueDate,
 		Completed: req.Completed,
 	})
@@ -84,7 +84,7 @@ func (h *TodoHandler) replace(c *gin.Context) {
 		return
 	}
 	result, err := h.svc.Replace(c.Request.Context(), c.Param("id"), service.ReplaceInput{
-		Text:      req.Text,
+		Description: req.Description,
 		DueDate:   req.DueDate,
 		Completed: req.Completed,
 	})
@@ -105,7 +105,7 @@ func (h *TodoHandler) patch(c *gin.Context) {
 		return
 	}
 	todo, err := h.svc.Patch(c.Request.Context(), c.Param("id"), service.PatchInput{
-		Text:      req.Text,
+		Description: req.Description,
 		DueDate:   req.DueDate,
 		Completed: req.Completed,
 	})
@@ -126,8 +126,8 @@ func (h *TodoHandler) delete(c *gin.Context) {
 
 func toResponse(t *domain.Todo) todoResponse {
 	return todoResponse{
-		ID:        t.ID,
-		Text:      t.Text,
+		ID:          t.ID,
+		Description: t.Description,
 		DueDate:   t.DueDate.Format("2006-01-02"),
 		Completed: t.Completed,
 	}

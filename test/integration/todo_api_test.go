@@ -55,8 +55,8 @@ func TestTodoCRUDFlow(t *testing.T) {
 	defer ts.Close()
 	base := ts.URL + "/api/v1/todos"
 
-	create := func(text, due string) string {
-		body, _ := json.Marshal(map[string]string{"text": text, "due_date": due})
+	create := func(description, due string) string {
+		body, _ := json.Marshal(map[string]string{"description": description, "due_date": due})
 		resp, err := http.Post(base, "application/json", bytes.NewReader(body))
 		if err != nil {
 			t.Fatalf("post: %v", err)
@@ -122,7 +122,7 @@ func TestPutReplaceUpdatesTodo(t *testing.T) {
 	defer ts.Close()
 	base := ts.URL + "/api/v1/todos"
 
-	createBody, _ := json.Marshal(map[string]string{"text": "original", "due_date": "2026-06-10"})
+	createBody, _ := json.Marshal(map[string]string{"description": "original", "due_date": "2026-06-10"})
 	createResp, err := http.Post(base, "application/json", bytes.NewReader(createBody))
 	if err != nil {
 		t.Fatalf("post: %v", err)
@@ -133,7 +133,7 @@ func TestPutReplaceUpdatesTodo(t *testing.T) {
 	id := created["id"].(string)
 
 	putBody, _ := json.Marshal(map[string]interface{}{
-		"text":      "replaced",
+		"description":      "replaced",
 		"due_date":  "2026-06-25",
 		"completed": true,
 	})
@@ -155,7 +155,7 @@ func TestPutReplaceUpdatesTodo(t *testing.T) {
 	defer getResp.Body.Close()
 	var got map[string]interface{}
 	_ = json.NewDecoder(getResp.Body).Decode(&got)
-	if got["text"] != "replaced" || got["due_date"] != "2026-06-25" || got["completed"] != true {
+	if got["description"] != "replaced" || got["due_date"] != "2026-06-25" || got["completed"] != true {
 		t.Fatalf("unexpected todo after put: %+v", got)
 	}
 }
@@ -165,8 +165,8 @@ func TestListIncludeCompleted(t *testing.T) {
 	defer ts.Close()
 	base := ts.URL + "/api/v1/todos"
 
-	post := func(text, due string) string {
-		body, _ := json.Marshal(map[string]string{"text": text, "due_date": due})
+	post := func(description, due string) string {
+		body, _ := json.Marshal(map[string]string{"description": description, "due_date": due})
 		resp, err := http.Post(base, "application/json", bytes.NewReader(body))
 		if err != nil {
 			t.Fatalf("post: %v", err)
@@ -220,8 +220,8 @@ func TestListIncludeCompletedQueryValues(t *testing.T) {
 	defer ts.Close()
 	base := ts.URL + "/api/v1/todos"
 
-	post := func(text, due string) string {
-		body, _ := json.Marshal(map[string]string{"text": text, "due_date": due})
+	post := func(description, due string) string {
+		body, _ := json.Marshal(map[string]string{"description": description, "due_date": due})
 		resp, err := http.Post(base, "application/json", bytes.NewReader(body))
 		if err != nil {
 			t.Fatalf("post: %v", err)

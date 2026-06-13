@@ -17,7 +17,7 @@ export default function () {
     const createRes = http.post(
         API,
         JSON.stringify({
-            text: 'k6 smoke test',
+            description: 'k6 smoke test',
             due_date: '2026-06-15',
             completed: false,
         }),
@@ -70,7 +70,7 @@ export default function () {
 
     // PUT replace (same body → X-No-Changes)
     const replaceBody = JSON.stringify({
-        text: todo.text,
+        description: todo.description,
         due_date: todo.due_date,
         completed: true,
     });

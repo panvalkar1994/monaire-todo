@@ -154,7 +154,7 @@ Stop the server with **Ctrl+C** — it shuts down gracefully (15s timeout for in
 # Create a todo
 curl -s -X POST http://localhost:8080/api/v1/todos \
   -H 'Content-Type: application/json' \
-  -d '{"text":"Buy groceries","due_date":"2026-06-15"}'
+  -d '{"description":"Buy groceries","due_date":"2026-06-15"}'
 
 # List incomplete todos (sorted by due_date)
 curl -s http://localhost:8080/api/v1/todos
@@ -296,7 +296,7 @@ All endpoints return JSON. Errors use `{ "error": "message" }`.
 ```json
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
-  "text": "Buy groceries",
+  "description": "Buy groceries",
   "due_date": "2026-06-15",
   "completed": false
 }
@@ -305,7 +305,7 @@ All endpoints return JSON. Errors use `{ "error": "message" }`.
 | Field | Type | Notes |
 |-------|------|-------|
 | `id` | UUID string | Server-generated on create |
-| `text` | string | Required, non-empty |
+| `description` | string | Required, non-empty task details |
 | `due_date` | string | ISO date `YYYY-MM-DD` |
 | `completed` | boolean | Defaults to `false` on create |
 
@@ -331,7 +331,7 @@ List results are always sorted by **`due_date` ascending**.
 # Create
 curl -X POST http://localhost:8080/api/v1/todos \
   -H 'Content-Type: application/json' \
-  -d '{"text":"Write README","due_date":"2026-06-20","completed":false}'
+  -d '{"description":"Write README","due_date":"2026-06-20","completed":false}'
 
 # Get (replace {id})
 curl http://localhost:8080/api/v1/todos/{id}
@@ -344,7 +344,7 @@ curl -X PATCH http://localhost:8080/api/v1/todos/{id} \
 # Full replace
 curl -X PUT http://localhost:8080/api/v1/todos/{id} \
   -H 'Content-Type: application/json' \
-  -d '{"text":"Write README","due_date":"2026-06-22","completed":true}'
+  -d '{"description":"Write README","due_date":"2026-06-22","completed":true}'
 
 # Delete
 curl -X DELETE http://localhost:8080/api/v1/todos/{id}

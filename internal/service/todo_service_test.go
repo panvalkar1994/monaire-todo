@@ -48,7 +48,7 @@ func (m *mockRepo) Replace(_ context.Context, todo *domain.Todo) error {
 	if !ok {
 		return domain.ErrNotFound
 	}
-	if existing.Text == todo.Text && existing.DueDate.Equal(todo.DueDate) && existing.Completed == todo.Completed {
+	if existing.Description == todo.Description && existing.DueDate.Equal(todo.DueDate) && existing.Completed == todo.Completed {
 		return domain.ErrNoChanges
 	}
 	copied := *todo
@@ -61,8 +61,8 @@ func (m *mockRepo) Update(_ context.Context, id string, patch domain.TodoPatch) 
 	if !ok {
 		return domain.ErrNotFound
 	}
-	if patch.Text != nil {
-		t.Text = *patch.Text
+	if patch.Description != nil {
+		t.Description = *patch.Description
 	}
 	if patch.DueDate != nil {
 		t.DueDate = *patch.DueDate
@@ -83,11 +83,11 @@ func (m *mockRepo) Delete(_ context.Context, id string) error {
 
 func TestCreateValidation(t *testing.T) {
 	svc := service.NewTodoService(newMockRepo())
-	_, err := svc.Create(context.Background(), service.CreateInput{Text: "  ", DueDate: "2026-06-15"})
+	_, err := svc.Create(context.Background(), service.CreateInput{Description: "  ", DueDate: "2026-06-15"})
 	if err == nil {
-		t.Fatal("expected validation error for empty text")
+		t.Fatal("expected validation error for empty description")
 	}
-	_, err = svc.Create(context.Background(), service.CreateInput{Text: "ok", DueDate: "bad-date"})
+	_, err = svc.Create(context.Background(), service.CreateInput{Description: "ok", DueDate: "bad-date"})
 	if err == nil {
 		t.Fatal("expected validation error for bad date")
 	}
@@ -95,7 +95,7 @@ func TestCreateValidation(t *testing.T) {
 
 func TestCreateSuccess(t *testing.T) {
 	svc := service.NewTodoService(newMockRepo())
-	todo, err := svc.Create(context.Background(), service.CreateInput{Text: "buy milk", DueDate: "2026-06-15"})
+	todo, err := svc.Create(context.Background(), service.CreateInput{Description: "buy milk", DueDate: "2026-06-15"})
 	if err != nil {
 		t.Fatalf("create: %v", err)
 	}
@@ -107,7 +107,7 @@ func TestCreateSuccess(t *testing.T) {
 func TestReplaceCreatesWhenMissing(t *testing.T) {
 	svc := service.NewTodoService(newMockRepo())
 	result, err := svc.Replace(context.Background(), "fixed-id", service.ReplaceInput{
-		Text: "new task", DueDate: "2026-06-20", Completed: true,
+		Description: "new task", DueDate: "2026-06-20", Completed: true,
 	})
 	if err != nil {
 		t.Fatalf("replace create: %v", err)
@@ -120,12 +120,12 @@ func TestReplaceCreatesWhenMissing(t *testing.T) {
 func TestReplaceNoChanges(t *testing.T) {
 	repo := newMockRepo()
 	svc := service.NewTodoService(repo)
-	created, err := svc.Create(context.Background(), service.CreateInput{Text: "same", DueDate: "2026-06-15"})
+	created, err := svc.Create(context.Background(), service.CreateInput{Description: "same", DueDate: "2026-06-15"})
 	if err != nil {
 		t.Fatalf("create: %v", err)
 	}
 	result, err := svc.Replace(context.Background(), created.ID, service.ReplaceInput{
-		Text: "same", DueDate: "2026-06-15", Completed: false,
+		Description: "same", DueDate: "2026-06-15", Completed: false,
 	})
 	if err != nil {
 		t.Fatalf("replace: %v", err)

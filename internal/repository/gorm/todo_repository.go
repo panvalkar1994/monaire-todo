@@ -63,7 +63,7 @@ func (r *TodoRepository) List(ctx context.Context, includeCompleted bool) ([]*do
 func (r *TodoRepository) Replace(ctx context.Context, todo *domain.Todo) error {
 	model := toModel(todo)
 	result := r.db.WithContext(ctx).Model(&TodoModel{}).Where("id = ?", todo.ID).Updates(map[string]interface{}{
-		"text":       model.Text,
+		"description": model.Description,
 		"due_date":   model.DueDate,
 		"completed":  model.Completed,
 		"updated_at": time.Now(),
@@ -79,8 +79,8 @@ func (r *TodoRepository) Replace(ctx context.Context, todo *domain.Todo) error {
 
 func (r *TodoRepository) Update(ctx context.Context, id string, patch domain.TodoPatch) error {
 	updates := map[string]any{}
-	if patch.Text != nil {
-		updates["text"] = *patch.Text
+	if patch.Description != nil {
+		updates["description"] = *patch.Description
 	}
 	if patch.DueDate != nil {
 		updates["due_date"] = *patch.DueDate
@@ -125,8 +125,8 @@ func (r *TodoRepository) refresh(ctx context.Context, todo *domain.Todo) error {
 
 func toModel(t *domain.Todo) TodoModel {
 	return TodoModel{
-		ID:        t.ID,
-		Text:      t.Text,
+		ID:          t.ID,
+		Description: t.Description,
 		DueDate:   t.DueDate,
 		Completed: t.Completed,
 		CreatedAt: t.CreatedAt,
@@ -136,8 +136,8 @@ func toModel(t *domain.Todo) TodoModel {
 
 func fromModel(m TodoModel) domain.Todo {
 	return domain.Todo{
-		ID:        m.ID,
-		Text:      m.Text,
+		ID:          m.ID,
+		Description: m.Description,
 		DueDate:   m.DueDate,
 		Completed: m.Completed,
 		CreatedAt: m.CreatedAt,
