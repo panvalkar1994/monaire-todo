@@ -31,7 +31,7 @@ paths:
             Include completed todos in the result.
             Accepted truthy values: `true`, `1`, `yes` (case-insensitive).
             Accepted falsy values: `false`, `0`, `no`, or empty/omitted.
-            Any other value returns HTTP 417.
+            Any other value returns HTTP 400.
           schema:
             type: string
             enum:
@@ -80,7 +80,7 @@ paths:
                       description: "Submit report"
                       due_date: "2026-06-15"
                       completed: true
-        "417":
+        "400":
           description: Invalid include_completed query value
           content:
             application/json:

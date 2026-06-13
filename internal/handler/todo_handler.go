@@ -59,7 +59,7 @@ func (h *TodoHandler) get(c *gin.Context) {
 func (h *TodoHandler) list(c *gin.Context) {
 	includeCompleted, err := parseIncludeCompleted(c.Query("include_completed"))
 	if err != nil {
-		writeError(c, http.StatusExpectationFailed, err.Error())
+		writeError(c, http.StatusBadRequest, err.Error())
 		return
 	}
 	todos, err := h.svc.List(c.Request.Context(), includeCompleted)

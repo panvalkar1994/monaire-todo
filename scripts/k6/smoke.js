@@ -49,10 +49,10 @@ export default function () {
         'list all status 200': (r) => r.status === 200,
     });
 
-    // List invalid include_completed → 417
+    // List invalid include_completed → 400
     const invalidListRes = http.get(`${API}?include_completed=maybe`);
     check(invalidListRes, {
-        'invalid include_completed status 417': (r) => r.status === 417,
+        'invalid include_completed status 400': (r) => r.status === 400,
         'invalid include_completed error': (r) =>
             r.json('error') === 'include_completed allowed values: true|false|empty',
     });

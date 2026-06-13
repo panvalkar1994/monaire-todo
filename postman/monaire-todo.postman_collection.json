@@ -267,15 +267,15 @@
           "response": []
         },
         {
-          "name": "List Todos (include_completed=invalid → 417)",
+          "name": "List Todos (include_completed=invalid → 400)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Status 417 Expectation Failed', function () {",
-                  "    pm.response.to.have.status(417);",
+                  "pm.test('Status 400 Bad Request', function () {",
+                  "    pm.response.to.have.status(400);",
                   "});",
                   "",
                   "pm.test('Error message', function () {",
@@ -300,7 +300,7 @@
                 }
               ]
             },
-            "description": "Invalid values (e.g. maybe, 2, t) return HTTP 417 with error body."
+            "description": "Invalid values (e.g. maybe, 2, t) return HTTP 400 with error body."
           },
           "response": []
         }

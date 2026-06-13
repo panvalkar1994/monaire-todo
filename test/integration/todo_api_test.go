@@ -271,7 +271,7 @@ func TestListIncludeCompletedQueryValues(t *testing.T) {
 	assertListCount(t, "?include_completed=yes", 2)
 }
 
-func TestListIncludeCompletedInvalidReturns417(t *testing.T) {
+func TestListIncludeCompletedInvalidReturns400(t *testing.T) {
 	ts := setupTestServer(t)
 	defer ts.Close()
 	base := ts.URL + "/api/v1/todos"
@@ -282,8 +282,8 @@ func TestListIncludeCompletedInvalidReturns417(t *testing.T) {
 			t.Fatalf("list %q: %v", query, err)
 		}
 		defer resp.Body.Close()
-		if resp.StatusCode != http.StatusExpectationFailed {
-			t.Fatalf("list %q status: %d, want 417", query, resp.StatusCode)
+		if resp.StatusCode != http.StatusBadRequest {
+			t.Fatalf("list %q status: %d, want 400", query, resp.StatusCode)
 		}
 		var body map[string]string
 		_ = json.NewDecoder(resp.Body).Decode(&body)

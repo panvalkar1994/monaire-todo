@@ -23,6 +23,19 @@ A production-style Go REST API for managing todo items. Built as a layered servi
 
 ---
 
+## Assumptions
+
+- Todos are identified by UUID.
+- Due dates use `YYYY-MM-DD`.
+- Completed todos are hidden by default; use `include_completed=true` (or `1`, `yes`, etc.) to include them.
+- Invalid `include_completed` values return HTTP 400.
+- PUT performs full replacement; if the ID does not exist, the todo is created (upsert).
+- PUT with identical data returns 200 and `X-No-Changes: true`.
+- PATCH performs partial updates.
+- Todos are permanently deleted.
+
+---
+
 ## Tech stack
 
 - **Go 1.25** — language & toolchain
@@ -315,7 +328,7 @@ All endpoints return JSON. Errors use `{ "error": "message" }`.
 |-------|--------|
 | omitted, empty, `false`, `0`, `no` | Incomplete todos only |
 | `true`, `1`, `yes` | All todos |
-| anything else | **417** — `include_completed allowed values: true\|false\|empty` |
+| anything else | **400** — `include_completed allowed values: true\|false\|empty` |
 
 List results are always sorted by **`due_date` ascending**.
 
@@ -360,7 +373,7 @@ Full contract: [`openapi/openapi.yaml`](openapi/openapi.yaml)
 2. **Import** → `postman/monaire-todo.postman_collection.json`
 3. Optional environment: `postman/monaire-todo.postman_environment.json` (`baseUrl` = `http://localhost:8080`)
 4. Run **Create Todo** first — it saves `todoId` for subsequent requests.
-5. The **List** folder covers default, `include_completed`, and invalid-query (417) cases.
+5. The **List** folder covers default, `include_completed`, and invalid-query (400) cases.
 
 You can also import `openapi/openapi.yaml` directly as OpenAPI 3.0.
 
@@ -380,7 +393,7 @@ Override host:
 BASE_URL=http://localhost:8080 k6 run scripts/k6/smoke.js
 ```
 
-The script covers create → get → list → patch → put → delete → 404, including `include_completed` and 417 validation.
+The script covers create → get → list → patch → put → delete → 404, including `include_completed` and 400 validation.
 
 ---
 
